@@ -1,0 +1,240 @@
+/* Reset some default styling */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* General body styling */
+body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #046b44, #2575fc); 
+   
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    text-align: center;
+   }
+   .video-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -1; /* Send video behind the content */
+}
+/* Header Styling */
+h1 {
+    font-size: 3rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-top: 20px;
+    letter-spacing: 2px;
+}
+
+/* Search container */
+.search-container {
+    max-width: 500px;
+    width: 100%;
+    margin: 30px 0;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+#city-input {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+    transition: 0.3s ease;
+}
+
+#city-input:focus {
+    outline: none;
+    border: 2px solid #fff;
+    background: #fff;
+    color: #000;
+}
+@media (max-width: 768px) {
+    .video-background {
+        display: none; 
+    }
+    body {
+       background-size: cover;
+    }
+}
+
+/* Search button */
+#search-btn {
+    width: 100%;
+    padding: 15px;
+    font-size: 1.2rem;
+    background-image: url("images/above-the-clouds-beautiful-beautiful-sky-black-sky-27759653.jpeg");
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#search-btn:hover {
+    background-color: #6a11cb;
+}
+
+/* Weather Info Section */
+#weather-info {
+    max-width: 500px;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 8px;
+    padding: 25px;
+    margin-top: 30px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.weather-icon {
+    width: 80px;
+    margin: 15px auto;
+}
+
+/* Weather info text */
+#weather-info h2 {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+}
+
+#weather-info p {
+    font-size: 1.1rem;
+    margin: 5px 0;
+}
+
+/* Forecast Section */
+#forecast {
+    display: flex;
+    justify-content: space-around;
+    gap: 10px;
+    margin-top: 40px;
+}
+
+.forecast-day {
+    background:#f44336(0, 0, 0, 0.6);
+    color: rosybrown;
+    padding: 15px;
+    border-radius: 8px;
+    width: 18%;
+    text-align: center;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.forecast-day:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.forecast-day img {
+    width: 50px;
+    margin: 10px 0;
+}
+
+.forecast-day p {
+    font-size: 1rem;
+}
+
+/* Error Message */
+#error-message {
+    display: none;
+    background-color: #f44336;
+    color: white;
+    padding: 15px;
+    border-radius: 5px;
+    width: 100%;
+    max-width: 500px;
+    margin-top: 20px;
+    font-size: 1.2rem;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Footer Styling */
+footer {
+    position: bottom;
+    bottom: 0;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    text-align: center;
+    padding: 10px 0;
+    font-size: 1rem;
+}
+
+footer a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}
+.footer .single-footer {
+	margin: 5px 0;
+}
+.footer .single-footer h2 {
+	padding-bottom: 5px;
+	margin-bottom: 5px;
+}
+.footer .footer-top {
+	padding: 5px 0px 0px;
+}
+
+.footer .copyright {
+	padding: 5px 0;
+}
+
+/* Responsive Design for Mobile */
+@media (max-width: 768px) {
+    .search-container {
+        padding: 15px;
+    }
+
+    #search-btn {
+        font-size: 1rem;
+    }
+
+    #weather-info {
+        padding: 15px;
+    }
+
+    .forecast-day {
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
+    #forecast {
+        flex-direction: column;
+        align-items: center;
+    }
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Applying fade-in effect */
+#weather-info, #forecast, #error-message {
+    animation: fadeIn 1s ease-out;
+}
