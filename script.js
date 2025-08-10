@@ -1,4 +1,4 @@
-const apiKey = '3c16b8a5aa75467de39f45623ebd11da'; // Replace with your actual OpenWeatherMap API key
+const apiKey = (window.CONFIG && window.CONFIG.OPENWEATHER_API_KEY) || '';
 
 // Elements
 const cityInput = document.getElementById('city-input');
@@ -15,35 +15,50 @@ const forecastUrl = 'https://api.openweathermap.org/data/2.5/forecast?q=';
 
 // Function to fetch weather data
 function getWeatherData(city) {
-    const weatherRequestUrl = `${weatherUrl}${city}&appid=${apiKey}&units=metric`;
+    if (!apiKey) {
+        showError('Missing API key. Please create config.js with your OpenWeather API key.');
+        return;
+    }
+    const weatherRequestUrl = `${weatherUrl}${encodeURIComponent(city)}&appid=${apiKey}&units=metric`;
 
     fetch(weatherRequestUrl)
-        .then(response => response.json())
-        .then(data => {
-            if (data.cod === '404') {
-                showError('City not found.');
-            } else {
-                displayWeatherData(data);
-                get5DayForecast(city);
-                clearError();
+        .then(async (response) => {
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data && data.message ? data.message : 'Request failed');
             }
+            return data;
         })
-        .catch(() => {
-            showError('Error fetching data. Please try again later.');
+        .then(data => {
+            displayWeatherData(data);
+            get5DayForecast(city);
+            clearError();
+        })
+        .catch((err) => {
+            showError(`Error fetching data: ${err.message || 'Please try again later.'}`);
         });
 }
 
 // Function to fetch 5-day weather forecast
 function get5DayForecast(city) {
-    const forecastRequestUrl = `${forecastUrl}${city}&appid=${apiKey}&units=metric`;
+    if (!apiKey) {
+        return; // Error already shown by getWeatherData
+    }
+    const forecastRequestUrl = `${forecastUrl}${encodeURIComponent(city)}&appid=${apiKey}&units=metric`;
 
     fetch(forecastRequestUrl)
-        .then(response => response.json())
+        .then(async (response) => {
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data && data.message ? data.message : 'Request failed');
+            }
+            return data;
+        })
         .then(data => {
             display5DayForecast(data);
         })
-        .catch(() => {
-            showError('Error fetching forecast data.');
+        .catch((err) => {
+            showError(`Error fetching forecast data: ${err.message || ''}`);
         });
 }
 
@@ -53,7 +68,7 @@ function displayWeatherData(data) {
     const weather = data.weather[0].description;
     const humidity = data.main.humidity;
     const windSpeed = data.wind.speed;
-    const icon = `http://openweathermap.org/img/wn/${data.weather[0].icon}.png`;
+    const icon = `https://openweathermap.org/img/wn/${data.weather[0].icon}.png`;
 
     weatherInfo.innerHTML = `
         <div>
@@ -69,13 +84,19 @@ function displayWeatherData(data) {
 
 // Function to display 5-day forecast
 function display5DayForecast(data) {
-    forecastContainer.innerHTML = ''; // Clear previous forecast
+    forecastContainer.innerHTML = '';
 
-    data.list.slice(0, 5).forEach((forecast) => {
+    // Pick one forecast per day around midday when available
+    const byNoon = (data.list || []).filter(item => item.dt_txt && item.dt_txt.includes('12:00:00'));
+    const representative = byNoon.length >= 5
+        ? byNoon.slice(0, 5)
+        : (data.list || []).filter((_, idx) => idx % 8 === 0).slice(0, 5);
+
+    representative.forEach((forecast) => {
         const date = new Date(forecast.dt * 1000).toLocaleDateString();
         const temp = forecast.main.temp;
         const weather = forecast.weather[0].description;
-        const icon = `http://openweathermap.org/img/wn/${forecast.weather[0].icon}.png`;
+        const icon = `https://openweathermap.org/img/wn/${forecast.weather[0].icon}.png`;
 
         const forecastElement = document.createElement('div');
         forecastElement.classList.add('forecast-day');
@@ -111,16 +132,23 @@ searchBtn.addEventListener('click', () => {
 });
 
 // Optional: Geolocation feature (auto-fetch weather for user location)
-navigator.geolocation.getCurrentPosition((position) => {
-    const lat = position.coords.latitude;
-    const lon = position.coords.longitude;
+if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition((position) => {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
 
-    const geolocationUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`;
+        const geolocationUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`;
 
-    fetch(geolocationUrl)
-        .then(response => response.json())
-        .then(data => {
-            displayWeatherData(data);
-            get5DayForecast(data.name);
-        });
-});
+        fetch(geolocationUrl)
+            .then(response => response.json())
+            .then(data => {
+                displayWeatherData(data);
+                get5DayForecast(data.name);
+            })
+            .catch(() => {
+                // Silent fail for geolocation fetch; no UI disruption
+            });
+    }, () => {
+        // User denied or error; do nothing
+    });
+}
