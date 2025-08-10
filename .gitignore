@@ -1,0 +1,10 @@
+# Local config containing secrets
+config.js
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Node / tooling caches (future-proof)
+node_modules/
+*.log
